@@ -37,7 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (request.getServletPath().contains("/user")) {
+        //Pula o filto de cadastrar novos usuários
+        String path = request.getServletPath();
+        if (path.equals("/users") && request.getMethod().equals("POST")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        //Pula o filto de fazer login
+        if (request.getServletPath().contains("/auth/login")) {
             filterChain.doFilter(request, response);
             return;
         }

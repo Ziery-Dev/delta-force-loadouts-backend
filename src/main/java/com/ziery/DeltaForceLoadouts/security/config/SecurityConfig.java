@@ -56,7 +56,7 @@ public class SecurityConfig {
 
                 // Define endpoints públicos e os demais somente autenticado
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/teste", "/user", "/auth/login").permitAll()
+                        .requestMatchers("/teste", "/users", "/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 //  Define como os erros de autenticação serão tratados
