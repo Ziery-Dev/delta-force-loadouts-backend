@@ -15,7 +15,7 @@ public class Operator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(length = 30, nullable = false, unique = true)
     private String name;
@@ -26,7 +26,7 @@ public class Operator {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
-    @ManyToMany(mappedBy = "campatibleOperators")
+    @ManyToMany(mappedBy = "compatibleOperators")
     @EqualsAndHashCode.Exclude
     private Set<Weapon> compatibleWeapons = new HashSet<>();
 

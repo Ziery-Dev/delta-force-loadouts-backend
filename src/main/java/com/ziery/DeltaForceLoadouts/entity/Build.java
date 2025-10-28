@@ -21,7 +21,6 @@ public class Build {
     @Column(length = 15, nullable = false)
     private BuildRange distance_range;
 
-
     @ManyToOne
     @JoinColumn(name = "weapon_id")
     private Weapon weapon;

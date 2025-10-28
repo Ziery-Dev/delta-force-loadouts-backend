@@ -17,7 +17,7 @@ public class Weapon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 30, nullable = false, unique = true)
+    @Column(length = 15, nullable = false, unique = true)
     private String name;
 
     @Column(length = 15, nullable = false)
@@ -32,6 +32,6 @@ public class Weapon {
             inverseJoinColumns = @JoinColumn(name = "operator_id") // Coluna que referencia o Operator na tabela intermediária
     )
     @EqualsAndHashCode.Exclude
-    private Set<Operator> campatibleOperators = new HashSet<>();
+    private Set<Operator> compatibleOperators = new HashSet<>();
 
 }
