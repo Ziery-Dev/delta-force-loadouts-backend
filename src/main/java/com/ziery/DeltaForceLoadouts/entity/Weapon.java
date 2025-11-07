@@ -24,6 +24,10 @@ public class Weapon {
     @Enumerated(EnumType.STRING)
     private WeaponCategory category;
 
+    @Column(name = "img_url", length = 200, nullable = false)
+    private String imgUrl;
+
+
 
     @ManyToMany
     @JoinTable(

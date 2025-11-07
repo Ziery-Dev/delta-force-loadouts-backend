@@ -11,7 +11,9 @@ public record WeaponDtoResponse(
         Integer id,
         String name,
         WeaponCategory category,
+        String imgUrl,
         Set<Integer> operatorIds
+
 ) {
 
     //Aqui o construtor pega o Operador compativel que é atributo de arma e responde no dto somente com seu Id
@@ -20,6 +22,7 @@ public record WeaponDtoResponse(
                 weapon.getId(),
                 weapon.getName(),
                 weapon.getCategory(),
+                weapon.getImgUrl(),
                 weapon.getCompatibleOperators()
                         .stream()
                         .map(Operator::getId)

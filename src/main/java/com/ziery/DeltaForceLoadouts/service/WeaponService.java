@@ -51,6 +51,7 @@ public class WeaponService{
         Weapon weapon = new Weapon();
         weapon.setName(weaponDtoRequest.name());
         weapon.setCategory(weaponDtoRequest.category());
+        weapon.setImgUrl(weaponDtoRequest.imgUrl());
         weapon.setCompatibleOperators(operators);
 
         Weapon weaponSave = weaponRepository.save(weapon);
@@ -88,6 +89,7 @@ public class WeaponService{
 
         verifyWeaponId.setName(request.name());
         verifyWeaponId.setCategory(request.category());
+        verifyWeaponId.setImgUrl(request.imgUrl());
         verifyWeaponId.setCompatibleOperators(operators);
         Weapon weaponSave = weaponRepository.save(verifyWeaponId);
         return new WeaponDtoResponse(weaponSave);

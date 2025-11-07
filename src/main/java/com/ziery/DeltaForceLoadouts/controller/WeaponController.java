@@ -26,7 +26,7 @@ public class WeaponController {
     }
 
     @PostMapping
-    public ResponseEntity<WeaponDtoResponse> createWeapon(@Valid @RequestBody  WeaponDtoRequest request) {
+    public ResponseEntity<WeaponDtoResponse> createWeapon( @RequestBody @Valid  WeaponDtoRequest request) {
         var weaponSave = service.createWeapon(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(weaponSave);
 
@@ -46,7 +46,7 @@ public class WeaponController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WeaponDtoResponse> updateWeapon ( @PathVariable Integer id, @RequestBody WeaponDtoRequest request) {
+    public ResponseEntity<WeaponDtoResponse> updateWeapon ( @PathVariable Integer id, @RequestBody  @Valid WeaponDtoRequest request) {
         var weapon = service.updateWeapon(id, request);
         return ResponseEntity.ok().body(weapon);
     }
