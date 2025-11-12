@@ -26,14 +26,11 @@ public class BuildController {
 
     private final BuildService buildService;
     private final UserRepository userRepository;
-    @PostMapping
-    public ResponseEntity<BuildDtoResponse> createBuild(
-            @RequestBody @Valid BuildDtoRequest request,
-            Authentication authentication) {
 
+    @PostMapping
+    public ResponseEntity<BuildDtoResponse> createBuild( @RequestBody @Valid BuildDtoRequest request, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         User authenticatedUser = userDetails.getUser(); // método que retorna a entidade User
-
         BuildDtoResponse response = buildService.createBuild(request, authenticatedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -69,9 +66,6 @@ public class BuildController {
         BuildDtoResponse response = buildService.updateBuild(request, id, authenticatedUser);
         return ResponseEntity.ok(response);
     }
-
-
-
 
 
 

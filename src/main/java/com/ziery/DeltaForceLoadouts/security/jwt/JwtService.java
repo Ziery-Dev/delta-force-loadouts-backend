@@ -1,6 +1,7 @@
 package com.ziery.DeltaForceLoadouts.security.jwt;
 
 
+import com.ziery.DeltaForceLoadouts.security.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -33,14 +36,21 @@ public class JwtService {
     }
 
     // 🧾 Gera um token JWT contendo username e data de expiração
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("roles", user.getRole().name());
+
         return Jwts.builder()
-                .setSubject(userDetails.getUsername()) // Nome do usuário
-                .setIssuedAt(new Date(System.currentTimeMillis())) // Data de criação
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Assinatura HS256
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+
 
     //  Valida o token: username igual e não expirado
     public boolean isTokenValid(String token, UserDetails userDetails) {
