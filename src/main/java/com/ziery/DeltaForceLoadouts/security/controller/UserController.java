@@ -3,10 +3,13 @@ package com.ziery.DeltaForceLoadouts.security.controller;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoRequest;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoResponse;
 import com.ziery.DeltaForceLoadouts.security.service.UserService;
+import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsImpl;
+import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,4 +51,12 @@ public class UserController {
         var dtoResponse = userService.atualizarPorId(id, userDto);
         return ResponseEntity.ok(dtoResponse);
     }
+
+
+    //Obtem o nome do usuario logado
+    @GetMapping("/me")
+    public ResponseEntity<UserDtoResponse> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(new UserDtoResponse(userDetails.getUsername()));
+    }
+
 }

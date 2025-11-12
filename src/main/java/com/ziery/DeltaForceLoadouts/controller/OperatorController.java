@@ -3,6 +3,7 @@ package com.ziery.DeltaForceLoadouts.controller;
 import com.ziery.DeltaForceLoadouts.dto.request.OperatorDtoRequest;
 import com.ziery.DeltaForceLoadouts.dto.response.OperatorDtoResponse;
 import com.ziery.DeltaForceLoadouts.service.OperatorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class OperatorController {
     }
 
     @PostMapping
-    public ResponseEntity<OperatorDtoResponse> createOperator(@RequestBody OperatorDtoRequest operatorDtoRequest) {
+    public ResponseEntity<OperatorDtoResponse> createOperator(@RequestBody @Valid OperatorDtoRequest operatorDtoRequest) {
         var operatorDtoResponse = operatorService.createOperator(operatorDtoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(operatorDtoResponse);
 
@@ -43,7 +44,7 @@ public class OperatorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OperatorDtoResponse> updateOperator(@RequestBody OperatorDtoRequest operatorDtoRequest, @PathVariable Integer id) {
+    public ResponseEntity<OperatorDtoResponse> updateOperator(@RequestBody OperatorDtoRequest operatorDtoRequest, @Valid @PathVariable Integer id) {
         var response = operatorService.updateOperator(operatorDtoRequest, id);
         return ResponseEntity.ok().body(response);
     }

@@ -14,4 +14,6 @@ public class UserDtoResponse {
     private String username;
     private UserRoles role;
 
+    public UserDtoResponse(String username) {
+    }
 }

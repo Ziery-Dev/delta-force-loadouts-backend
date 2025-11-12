@@ -1,5 +1,6 @@
 package com.ziery.DeltaForceLoadouts.entity;
 
+import com.ziery.DeltaForceLoadouts.security.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,6 +13,11 @@ public class Build {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", nullable = false)
+    private User creator;
+
+
     @Column(length = 80, nullable = false, unique = true)
     private String code;
     @Column(length = 250, nullable = false)
@@ -20,6 +26,7 @@ public class Build {
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
     private BuildRange distance_range;
+
 
     @ManyToOne
     @JoinColumn(name = "weapon_id")
