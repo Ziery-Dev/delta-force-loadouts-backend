@@ -64,7 +64,7 @@ public class BuildService {
                 .orElseThrow(() -> new DadoNaoEncontradoException("Build não encontrada na base de dados"));
 
         boolean isCreator = build.getCreator().getId().equals(authenticatedUser.getId());
-        boolean isAdmin = authenticatedUser.getRole().equals("ROLE_ADMIN");
+        boolean isAdmin = authenticatedUser.getRole().toString().equals("ADMIN");
 
         if (!isCreator && !isAdmin) {
             throw new AcessoNegadoException("Você não tem permissão para remover esta build");
