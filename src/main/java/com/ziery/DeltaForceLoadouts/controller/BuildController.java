@@ -67,6 +67,16 @@ public class BuildController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/minhas-builds")
+    public ResponseEntity<List<BuildDtoResponse>> getBuildsByCreatorId(Authentication authentication) {
+        User authenticatedUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+
+        List<BuildDtoResponse> builds = buildService.getBuildsByCreatorId(authenticatedUser.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(builds);
+
+    }
+
 
 
 

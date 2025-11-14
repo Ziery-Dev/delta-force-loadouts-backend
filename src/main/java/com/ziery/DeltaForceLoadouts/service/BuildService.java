@@ -106,5 +106,10 @@ public class BuildService {
         var buildSave = buildRepository.save(existingBuild);
         return new BuildDtoResponse(buildSave);
     }
+
+    public List<BuildDtoResponse> getBuildsByCreatorId(Long creatorId) {
+        List<Build> builds = buildRepository.findByCreatorId(creatorId);
+        return builds.stream().map(BuildDtoResponse::new).toList();
+    }
 }
 
