@@ -3,9 +3,14 @@ package com.ziery.DeltaForceLoadouts.entity;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Table(name = "Builds")
 public class Build {
 

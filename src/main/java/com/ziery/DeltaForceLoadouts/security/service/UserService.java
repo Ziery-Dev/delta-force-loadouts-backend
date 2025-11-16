@@ -1,18 +1,24 @@
 package com.ziery.DeltaForceLoadouts.security.service;
 
+import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
+import com.ziery.DeltaForceLoadouts.entity.Build;
 import com.ziery.DeltaForceLoadouts.exception.DadoDuplicadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
+import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoRequest;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoResponse;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
+import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BuildRepository buildRepository;
 
     //Método para salvar novo usuário
     public UserDtoResponse salvar(UserDtoRequest userDto) {
@@ -75,6 +82,39 @@ public class UserService {
         var userSave = userRepository.save(verifId);
         return new UserDtoResponse(userSave.getId(), userSave.getUsername(), userSave.getRole());
 
+    }
+
+    //Listar builds favoritas
+    public List<BuildDtoResponse> getFavorites(User authenticatedUser ) {
+        Set <Build> builds = authenticatedUser.getFavoriteBuilds();
+        return builds.stream().map(BuildDtoResponse::new).toList();
+    }
+
+    //adicionar build a favoritos
+    @Transactional
+    public BuildDtoResponse addFavorite( Long buildId, User authenticatedUser) {
+        var build = buildRepository.findById(buildId).orElseThrow(()-> new DadoNaoEncontradoException("build não encontrada!"));
+
+        if (authenticatedUser.getFavoriteBuilds().contains(build)) {
+            return null; // já está nos favoritos
+        }
+
+        authenticatedUser.addFavoriteBuild(build);
+        userRepository.save(authenticatedUser);
+        return new BuildDtoResponse(build);
+
+    }
+
+
+    //Remover build de favoritos
+    public void removeFavorite(Long buildId, User authenticatedUser) {
+        var build = buildRepository.findById(buildId).orElseThrow(()-> new DadoNaoEncontradoException("build não encontrada!"));
+
+        if (!authenticatedUser.getFavoriteBuilds().contains(build)) {
+            return; // já não estava nos favoritos
+        }
+        authenticatedUser.removeFavoriteBuild(build);
+        userRepository.save(authenticatedUser);
     }
 }
 
