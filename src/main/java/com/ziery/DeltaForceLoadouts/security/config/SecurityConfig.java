@@ -6,6 +6,7 @@ import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -61,7 +62,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 // Define endpoints públicos e os demais somente autenticado
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users", "/auth/login").permitAll()
+                        .requestMatchers( "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users", "/arma", "/arma/**", "/operador", "/operador/**",  "/build", "/build/**" ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/arma", "/arma/**", "/operador", "/operador/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 //  Define como os erros de autenticação serão tratados
