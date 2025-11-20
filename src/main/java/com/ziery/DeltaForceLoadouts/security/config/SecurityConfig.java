@@ -63,7 +63,8 @@ public class SecurityConfig {
                 // Define endpoints públicos e os demais somente autenticado
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers( "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users", "/arma", "/arma/**", "/operador", "/operador/**",  "/build", "/build/**" ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users", "/arma", "/arma/**", "/operador", "/operador/**",  "/build", "/build/**" ).permitAll() //talvez remover users
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/arma", "/arma/**", "/operador", "/operador/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

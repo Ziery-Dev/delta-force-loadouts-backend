@@ -8,6 +8,7 @@ import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import com.ziery.DeltaForceLoadouts.security.service.UserService;
 import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsImpl;
+import com.ziery.DeltaForceLoadouts.service.BuildRatingService;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class BuildController {
 
     private final BuildService buildService;
     private final UserRepository userRepository;
+    private final BuildRatingService ratingService;
 
     @PostMapping
     public ResponseEntity<BuildDtoResponse> createBuild( @RequestBody @Valid BuildDtoRequest request, Authentication authentication) {
@@ -75,6 +77,24 @@ public class BuildController {
         List<BuildDtoResponse> builds = buildService.getBuildsByCreatorId(authenticatedUser.getId());
         return ResponseEntity.status(HttpStatus.OK).body(builds);
 
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> like(@PathVariable Long id, Authentication authentication) {
+        User authenticatedUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+        ratingService.rateBuild(authenticatedUser, id, 1);
+        return ResponseEntity.ok().build();
+
+    }
+
+
+    @PostMapping("/{id}/dislike")
+    public ResponseEntity<Void> dislike(@PathVariable Long id, Authentication authentication) {
+        User authenticatedUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+        ratingService.rateBuild(authenticatedUser, id, -1);
+        return ResponseEntity.ok().build();
     }
 
 
