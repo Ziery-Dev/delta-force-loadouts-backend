@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -36,6 +39,32 @@ public class Build {
     @ManyToOne
     @JoinColumn(name = "weapon_id")
     private Weapon weapon;
+
+    //Armazena a hora de criação da build
+    private Instant createdAt = Instant.now();
+
+
+    @OneToMany(mappedBy = "build")
+    private List<BuildRating> ratings;
+
+
+    //Identificam se o usuário ja avaliou a build e se deu like ou dislike
+    public boolean isLikedBy(User user) {
+        if (ratings == null) return false;
+        return ratings.stream().anyMatch(r ->
+                r.getUser().getId().equals(user.getId()) && r.getRating() == 1
+        );
+    }
+
+    public boolean isDislikedBy(User user) {
+        if (ratings == null) return false;
+        return ratings.stream().anyMatch(r ->
+                r.getUser().getId().equals(user.getId()) && r.getRating() == -1
+        );
+    }
+
+
+
 
 
 

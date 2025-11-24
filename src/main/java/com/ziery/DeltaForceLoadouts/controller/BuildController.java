@@ -30,18 +30,36 @@ public class BuildController {
     private final BuildRatingService ratingService;
 
     @PostMapping
-    public ResponseEntity<BuildDtoResponse> createBuild( @RequestBody @Valid BuildDtoRequest request, Authentication authentication) {
+    public ResponseEntity<BuildDtoResponse> createBuild(@RequestBody @Valid BuildDtoRequest request, Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         User authenticatedUser = userDetails.getUser(); // método que retorna a entidade User
         BuildDtoResponse response = buildService.createBuild(request, authenticatedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    //Retorna todas as builds sem uma ordem especifica
+      /* @GetMapping
+        public ResponseEntity<List<BuildDtoResponse>> getAllBuilds(Authentication authentication) {
+            User authenticatedUser = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+            List <BuildDtoResponse> builds = buildService.getAllBuilds(authenticatedUser.getId());
+            return ResponseEntity.status(HttpStatus.OK).body(builds);
+        }*/
     @GetMapping
-    public ResponseEntity<List<BuildDtoResponse>> getAllBuilds() {
-        List <BuildDtoResponse> builds = buildService.getAllBuilds();
-        return ResponseEntity.status(HttpStatus.OK).body(builds);
+    public ResponseEntity<List<BuildDtoResponse>> getAllBuildsSorted(
+            @RequestParam(defaultValue = "date") String sort,
+            @RequestParam(defaultValue = "asc") String order,
+            Authentication authentication
+    ) {
+
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+
+        return ResponseEntity.ok(
+                buildService.getBuildsSorted(sort, order, user.getId())
+        );
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<BuildDtoResponse> getBuildById(@PathVariable Long id) {
@@ -60,8 +78,8 @@ public class BuildController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BuildDtoResponse> removeBuildById(@PathVariable Long id,
-                                                        @RequestBody BuildDtoRequest request,
-                                                        Authentication authentication) {
+                                                            @RequestBody BuildDtoRequest request,
+                                                            Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
 
@@ -69,6 +87,7 @@ public class BuildController {
         return ResponseEntity.ok(response);
     }
 
+    //Retorna builds favoritadas
     @GetMapping("/minhas-builds")
     public ResponseEntity<List<BuildDtoResponse>> getBuildsByCreatorId(Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
@@ -79,27 +98,25 @@ public class BuildController {
 
     }
 
+    //Método like de build
     @PostMapping("/{id}/like")
-    public ResponseEntity<Void> like(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<BuildDtoResponse> like(@PathVariable Long id, Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
-        ratingService.rateBuild(authenticatedUser, id, 1);
-        return ResponseEntity.ok().build();
+        BuildDtoResponse buildDtoResponse = ratingService.rateBuild(authenticatedUser, id, 1);
+        return ResponseEntity.ok().body(buildDtoResponse);
 
     }
 
 
+    //Método dislike de build
     @PostMapping("/{id}/dislike")
-    public ResponseEntity<Void> dislike(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<BuildDtoResponse> dislike(@PathVariable Long id, Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
-        ratingService.rateBuild(authenticatedUser, id, -1);
-        return ResponseEntity.ok().build();
+        BuildDtoResponse buildDtoResponse = ratingService.rateBuild(authenticatedUser, id, -1);
+        return ResponseEntity.ok().body(buildDtoResponse);
     }
-
-
-
-
 
 
 }

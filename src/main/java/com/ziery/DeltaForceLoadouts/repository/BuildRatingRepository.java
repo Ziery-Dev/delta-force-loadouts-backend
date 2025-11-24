@@ -12,4 +12,7 @@ import java.util.Optional;
 @Repository
 public interface BuildRatingRepository extends JpaRepository<BuildRating, Long> {
     Optional<BuildRating> findByUserAndBuild(User user, Build build);
+
+    boolean existsByBuildIdAndUserIdAndRating(Long buildId, Long userId, int rating);
+
 }

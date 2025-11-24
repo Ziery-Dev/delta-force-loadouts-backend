@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -35,7 +36,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "build_id")
     )
-    private Set<Build> favoriteBuilds = new HashSet<>();
+    private Set<Build> favoriteBuilds = new LinkedHashSet<>();
 
 
 

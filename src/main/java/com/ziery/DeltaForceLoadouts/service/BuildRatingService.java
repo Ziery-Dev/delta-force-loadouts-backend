@@ -1,6 +1,7 @@
 package com.ziery.DeltaForceLoadouts.service;
 
 
+import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
 import com.ziery.DeltaForceLoadouts.entity.Build;
 import com.ziery.DeltaForceLoadouts.entity.BuildRating;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
@@ -17,7 +18,7 @@ public class BuildRatingService {
     private final BuildRepository buildRepository;
 
 
-    public void rateBuild(User user, Long buildId, int value) {
+    public BuildDtoResponse rateBuild(User user, Long buildId, int value) {
 
         //busca a build no respositorio
         Build build = buildRepository.findById(buildId).orElseThrow(() -> new DadoNaoEncontradoException("Build não encontrada!"));
@@ -27,19 +28,21 @@ public class BuildRatingService {
 
         if(existBuildRating.isEmpty()) { //se não foi avaliada, avalia inserindo o valor da avaliação (1 ou -1, like e dislike respectivamente)
             buildRatingRepository.save(new BuildRating( user, build, value));
-            return;
         }
 
-        BuildRating rating = existBuildRating.get();
-
-        if (rating.getRating() == value) {  //se avalição for a mesma anterior, somente remove
-            buildRatingRepository.delete(rating);
-        }
         else {
-            rating.setRating(value); //se a avaliação for diferente (substitue a avaliação anterior
-            buildRatingRepository.save(rating);
+
+            BuildRating rating = existBuildRating.get();
+
+            if (rating.getRating() == value) {  //se avalição for a mesma anterior, somente remove
+                buildRatingRepository.delete(rating);
+            } else {
+                rating.setRating(value); //se a avaliação for diferente (substitue a avaliação anterior
+                buildRatingRepository.save(rating);
+            }
         }
 
+        return new BuildDtoResponse(build, user);
 
 
 
