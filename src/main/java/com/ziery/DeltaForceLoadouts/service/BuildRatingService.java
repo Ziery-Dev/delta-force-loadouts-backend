@@ -27,16 +27,37 @@ public class BuildRatingService {
         var existBuildRating = buildRatingRepository.findByUserAndBuild(user, build);
 
         if(existBuildRating.isEmpty()) { //se não foi avaliada, avalia inserindo o valor da avaliação (1 ou -1, like e dislike respectivamente)
+            if (value == 1){
+                build.setLikeCount(build.getLikeCount() + 1);
+            } else if (value == -1) {
+                build.setDislikeCount(build.getDislikeCount() + 1);
+            }
             buildRatingRepository.save(new BuildRating( user, build, value));
+
         }
 
         else {
 
             BuildRating rating = existBuildRating.get();
-
             if (rating.getRating() == value) {  //se avalição for a mesma anterior, somente remove
+
+                if (value == 1){
+                    build.setLikeCount(build.getLikeCount() - 1);
+                } else if (value == -1) {
+                    build.setDislikeCount(build.getDislikeCount() - 1);
+                }
                 buildRatingRepository.delete(rating);
+
+
             } else {
+
+                if (rating.getRating() == 1) {
+                    build.setLikeCount(build.getLikeCount() - 1);
+                    build.setDislikeCount(build.getDislikeCount() + 1);
+                } else {
+                    build.setDislikeCount(build.getDislikeCount() - 1);
+                    build.setLikeCount(build.getLikeCount() + 1);
+                }
                 rating.setRating(value); //se a avaliação for diferente (substitue a avaliação anterior
                 buildRatingRepository.save(rating);
             }

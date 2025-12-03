@@ -1,8 +1,10 @@
 package com.ziery.DeltaForceLoadouts.controller;
 
 
+import com.ziery.DeltaForceLoadouts.domain.specification.BuildSpec;
 import com.ziery.DeltaForceLoadouts.dto.request.BuildDtoRequest;
 import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
+import com.ziery.DeltaForceLoadouts.entity.BuildRange;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
@@ -49,14 +51,15 @@ public class BuildController {
     public ResponseEntity<List<BuildDtoResponse>> getAllBuildsSorted(
             @RequestParam(defaultValue = "date") String sort,
             @RequestParam(defaultValue = "asc") String order,
-            Authentication authentication
+            Authentication authentication,
+            @RequestParam (required = false) BuildRange distanceRange
     ) {
 
         User user = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
 
         return ResponseEntity.ok(
-                buildService.getBuildsSorted(sort, order, user.getId())
+                buildService.getBuildsSorted(sort, order, user.getId(), distanceRange)
         );
     }
 

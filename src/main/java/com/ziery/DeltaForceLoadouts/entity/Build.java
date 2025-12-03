@@ -43,6 +43,10 @@ public class Build {
     //Armazena a hora de criação da build
     private Instant createdAt = Instant.now();
 
+    private Long likeCount = 0L;
+
+    private Long dislikeCount = 0L;
+
 
     @OneToMany(mappedBy = "build")
     private List<BuildRating> ratings;

@@ -15,7 +15,6 @@ public record BuildDtoResponse(
         Integer weaponId,
         Long creatorId,
         Instant createdAt,
-
         Boolean likedByUser,
         Boolean dislikedByUser
 ) {

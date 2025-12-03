@@ -1,9 +1,11 @@
 package com.ziery.DeltaForceLoadouts.service;
 
 
+import com.ziery.DeltaForceLoadouts.domain.specification.BuildSpec;
 import com.ziery.DeltaForceLoadouts.dto.request.BuildDtoRequest;
 import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
 import com.ziery.DeltaForceLoadouts.entity.Build;
+import com.ziery.DeltaForceLoadouts.entity.BuildRange;
 import com.ziery.DeltaForceLoadouts.entity.Weapon;
 import com.ziery.DeltaForceLoadouts.exception.AcessoNegadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoDuplicadoException;
@@ -15,8 +17,10 @@ import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -27,6 +31,8 @@ public class BuildService {
     private final WeaponRepository weaponRepository;
     private final UserRepository userRepository;
     private final BuildRatingRepository ratingRepository;
+
+
 
     public BuildDtoResponse createBuild(BuildDtoRequest request, User authenticatedUser) {
         var verifyCode = buildRepository.findByCode(request.code());
@@ -54,65 +60,84 @@ public class BuildService {
 
 
     //Lista todas as builds atraves de alguma ordenação (default: mais recente)
-    public List<BuildDtoResponse> getBuildsSorted(String sort, String order, Long currentUserId) {
+    public List<BuildDtoResponse> getBuildsSorted(
+            String sort,
+            String order,
+            Long currentUserId,
+            BuildRange distanceRange
+    ) {
+        // 1. Aplica filtro
+        Specification<Build> spec = BuildSpec.byDistanceRange(distanceRange);
 
-        List<Build> builds;
+        // 2. Busca filtrada (antes de ordenar)
+        List<Build> filtered = buildRepository.findAll(spec);
 
+        List<Build> ordered;
+
+        // 3. Ordenação
         if (sort.equalsIgnoreCase("date")) {
 
             if (order.equalsIgnoreCase("asc")) {
-                builds = buildRepository.findAllByOrderByCreatedAtAsc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getCreatedAt))
+                        .toList();
+
             } else if (order.equalsIgnoreCase("desc")) {
-                builds = buildRepository.findAllByOrderByCreatedAtDesc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getCreatedAt).reversed())
+                        .toList();
+
             } else {
-                throw new IllegalArgumentException("Order inválido: use 'asc' ou 'desc'");
+                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
             }
 
         }
 
         else if (sort.equalsIgnoreCase("likes")) {
+
             if (order.equalsIgnoreCase("asc")) {
-                builds = buildRepository.orderByLikesAsc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getLikeCount))
+                        .toList();
+
             } else if (order.equalsIgnoreCase("desc")) {
-                builds = buildRepository.orderByLikesDesc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getLikeCount).reversed())
+                        .toList();
+
             } else {
-                throw new IllegalArgumentException("Order inválido: use 'asc' ou 'desc'");
+                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
             }
-        }    else if (sort.equalsIgnoreCase("dislikes")) {
+        }
+        else if (sort.equalsIgnoreCase("dislikes")) {
+
             if (order.equalsIgnoreCase("asc")) {
-                builds = buildRepository.orderByDislikesAsc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getDislikeCount))
+                        .toList();
+
             } else if (order.equalsIgnoreCase("desc")) {
-                builds = buildRepository.orderByDislikesDesc();
+                ordered = filtered.stream()
+                        .sorted(Comparator.comparing(Build::getDislikeCount).reversed())
+                        .toList();
+
             } else {
-                throw new IllegalArgumentException("Order inválido: use 'asc' ou 'desc'");
+                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
             }
         }
 
         else {
-            throw new IllegalArgumentException("Sort inválido: use 'date' ou 'likes'");
+            throw new IllegalArgumentException("Sort inválido: use 'date', 'likes' ou 'dislikes'");
         }
 
+        // 4. Montagem DTO
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        return builds.stream()
+        return ordered.stream()
                 .map(b -> new BuildDtoResponse(b, currentUser))
                 .toList();
     }
-
-/*    //Lista todas as builds
-    public List<BuildDtoResponse> getAllBuilds(Long userId) {
-        List<Build> builds = buildRepository.findAll();
-
-        return builds.stream()
-                .map(build -> {
-                    boolean hasLiked = ratingRepository.existsByBuildIdAndUserIdAndRating(build.getId(), userId, 1);
-                    boolean hasDisliked = ratingRepository.existsByBuildIdAndUserIdAndRating(build.getId(), userId, -1);
-
-                    return new BuildDtoResponse(build, hasLiked, hasDisliked);
-                })
-                .toList();
-    }*/
 
 
     //Busca uma build pelo id
