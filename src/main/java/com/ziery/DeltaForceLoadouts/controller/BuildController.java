@@ -14,6 +14,11 @@ import com.ziery.DeltaForceLoadouts.service.BuildRatingService;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,19 +53,21 @@ public class BuildController {
             return ResponseEntity.status(HttpStatus.OK).body(builds);
         }*/
     @GetMapping
-    public ResponseEntity<List<BuildDtoResponse>> getAllBuildsSorted(
+    public Page<BuildDtoResponse> getAllBuildsSorted(
             @RequestParam(defaultValue = "date") String sort,
-            @RequestParam(defaultValue = "asc") String order,
-            Authentication authentication,
-            @RequestParam (required = false) BuildRange distanceRange
+            @RequestParam(defaultValue = "desc") String order,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) BuildRange distanceRange,
+            Authentication authentication
     ) {
 
         User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+                .orElseThrow();
 
-        return ResponseEntity.ok(
-                buildService.getBuildsSorted(sort, order, user.getId(), distanceRange)
-        );
+        Pageable pageable = PageRequest.of(page, size);
+
+        return buildService.getBuildsSorted(sort, order, user.getId(), distanceRange, pageable);
     }
 
 
@@ -90,14 +97,14 @@ public class BuildController {
         return ResponseEntity.ok(response);
     }
 
-    //Retorna builds favoritadas
+    //Retorna builds criadas pelo usuario
     @GetMapping("/minhas-builds")
-    public ResponseEntity<List<BuildDtoResponse>> getBuildsByCreatorId(Authentication authentication) {
+    public ResponseEntity<Page<BuildDtoResponse>> getBuildsByCreatorId(Authentication authentication, @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
 
-        List<BuildDtoResponse> builds = buildService.getBuildsByCreatorId(authenticatedUser.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(builds);
+        Page<BuildDtoResponse> builds = buildService.getBuildsByCreatorId(authenticatedUser.getId(), pageable);
+        return ResponseEntity.ok(builds);
 
     }
 

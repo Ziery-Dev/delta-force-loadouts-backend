@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -50,6 +52,10 @@ public class Build {
 
     @OneToMany(mappedBy = "build")
     private List<BuildRating> ratings;
+
+    @ManyToMany(mappedBy = "favoriteBuilds")
+    private Set<User> favoriteUsers = new HashSet<>();
+
 
 
     //Identificam se o usuário ja avaliou a build e se deu like ou dislike

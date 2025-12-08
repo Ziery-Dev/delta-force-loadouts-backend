@@ -1,6 +1,7 @@
 package com.ziery.DeltaForceLoadouts.security.controller;
 
 import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
+import com.ziery.DeltaForceLoadouts.entity.Build;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoRequest;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoResponse;
@@ -11,6 +12,10 @@ import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsImpl;
 import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -68,10 +73,12 @@ public class UserController {
 
     //Lista todas as builds favoritas do usuário
     @GetMapping("/favoritos")
-    public ResponseEntity<List<BuildDtoResponse>> getFavorites(Authentication authentication) {
+    public ResponseEntity<Page<BuildDtoResponse>> getFavorites(Authentication authentication,  @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC)
+    Pageable pageable) {
+
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
-        List<BuildDtoResponse> favoritos = userService.getFavorites(authenticatedUser);
+        Page<BuildDtoResponse> favoritos = userService.getFavorites(authenticatedUser.getId(), pageable);
         return ResponseEntity.ok(favoritos);
     }
 

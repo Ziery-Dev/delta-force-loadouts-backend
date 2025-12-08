@@ -12,6 +12,8 @@ import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,9 +87,9 @@ public class UserService {
     }
 
     //Listar builds favoritas
-    public List<BuildDtoResponse> getFavorites(User authenticatedUser ) {
-        Set <Build> builds = authenticatedUser.getFavoriteBuilds();
-        return builds.stream().map(BuildDtoResponse::new).toList();
+    public Page<BuildDtoResponse> getFavorites(Long userId, Pageable pageable ) {
+        Page<Build> page = buildRepository.findFavoritesByUserId(userId, pageable);
+        return page.map(BuildDtoResponse::new);
     }
 
     //adicionar build a favoritos

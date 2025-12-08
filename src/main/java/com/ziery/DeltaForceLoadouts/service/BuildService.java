@@ -16,6 +16,9 @@ import com.ziery.DeltaForceLoadouts.repository.WeaponRepository;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -60,84 +63,35 @@ public class BuildService {
 
 
     //Lista todas as builds atraves de alguma ordenação (default: mais recente)
-    public List<BuildDtoResponse> getBuildsSorted(
+    public Page<BuildDtoResponse> getBuildsSorted(
             String sort,
             String order,
             Long currentUserId,
-            BuildRange distanceRange
+            BuildRange distanceRange,
+            Pageable pageable
     ) {
-        // 1. Aplica filtro
+
         Specification<Build> spec = BuildSpec.byDistanceRange(distanceRange);
 
-        // 2. Busca filtrada (antes de ordenar)
-        List<Build> filtered = buildRepository.findAll(spec);
+        // define ordenação
+        Sort sortConfig = order.equalsIgnoreCase("asc")
+                ? Sort.by(sort).ascending()
+                : Sort.by(sort).descending();
 
-        List<Build> ordered;
+        Pageable pageableSorted = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sortConfig
+        );
 
-        // 3. Ordenação
-        if (sort.equalsIgnoreCase("date")) {
+        Page<Build> page = buildRepository.findAll(spec, pageableSorted);
 
-            if (order.equalsIgnoreCase("asc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getCreatedAt))
-                        .toList();
-
-            } else if (order.equalsIgnoreCase("desc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getCreatedAt).reversed())
-                        .toList();
-
-            } else {
-                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
-            }
-
-        }
-
-        else if (sort.equalsIgnoreCase("likes")) {
-
-            if (order.equalsIgnoreCase("asc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getLikeCount))
-                        .toList();
-
-            } else if (order.equalsIgnoreCase("desc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getLikeCount).reversed())
-                        .toList();
-
-            } else {
-                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
-            }
-        }
-        else if (sort.equalsIgnoreCase("dislikes")) {
-
-            if (order.equalsIgnoreCase("asc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getDislikeCount))
-                        .toList();
-
-            } else if (order.equalsIgnoreCase("desc")) {
-                ordered = filtered.stream()
-                        .sorted(Comparator.comparing(Build::getDislikeCount).reversed())
-                        .toList();
-
-            } else {
-                throw new IllegalArgumentException("Order inválido: 'asc' ou 'desc'");
-            }
-        }
-
-        else {
-            throw new IllegalArgumentException("Sort inválido: use 'date', 'likes' ou 'dislikes'");
-        }
-
-        // 4. Montagem DTO
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow();
 
-        return ordered.stream()
-                .map(b -> new BuildDtoResponse(b, currentUser))
-                .toList();
+        return page.map(b -> new BuildDtoResponse(b, currentUser));
     }
+
 
 
     //Busca uma build pelo id
@@ -197,9 +151,9 @@ public class BuildService {
         return new BuildDtoResponse(buildSave);
     }
 
-    public List<BuildDtoResponse> getBuildsByCreatorId(Long creatorId) {
-        List<Build> builds = buildRepository.findByCreatorId(creatorId);
-        return builds.stream().map(BuildDtoResponse::new).toList();
+    public Page<BuildDtoResponse> getBuildsByCreatorId(Long creatorId, Pageable pageable) {
+        Page <Build> page = buildRepository.findByCreatorId(creatorId, pageable);
+        return page.map(BuildDtoResponse::new);
     }
 
 
