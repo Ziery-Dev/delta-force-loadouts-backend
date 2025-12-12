@@ -8,6 +8,7 @@ import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoRequest;
 import com.ziery.DeltaForceLoadouts.security.dto.user.UserDtoResponse;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
+import com.ziery.DeltaForceLoadouts.security.entity.UserRoles;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
@@ -39,16 +40,17 @@ public class UserService {
         }
         User user = new User();
         user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole(userDto.getRole());
+        user.setRole(UserRoles.USUARIO);
         var userSave = userRepository.save(user);
-        return new UserDtoResponse(userSave.getId(), userSave.getUsername(), userSave.getRole());
+        return new UserDtoResponse(userSave.getId(), userSave.getUsername(), userSave.getEmail(), userSave.getRole());
     }
 
     //Buscar usuário por id
     public UserDtoResponse buscarPorId(Long id) {
         var verifiUser = userRepository.findById(id).orElseThrow( () -> new DadoNaoEncontradoException("Usuário não econtrado"));
-        return new UserDtoResponse(verifiUser.getId(), verifiUser.getUsername(), verifiUser.getRole());
+        return new UserDtoResponse(verifiUser.getId(), verifiUser.getUsername(), verifiUser.getEmail(), verifiUser.getRole());
     }
 
     //Buscar todos usuários
@@ -80,9 +82,9 @@ public class UserService {
         }
         verifId.setUsername(userDto.getUsername());
         verifId.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        verifId.setRole(userDto.getRole());
+        verifId.setRole(UserRoles.USUARIO);
         var userSave = userRepository.save(verifId);
-        return new UserDtoResponse(userSave.getId(), userSave.getUsername(), userSave.getRole());
+        return new UserDtoResponse(userSave.getId(), userSave.getUsername(), userSave.getEmail(), userSave.getRole());
 
     }
 

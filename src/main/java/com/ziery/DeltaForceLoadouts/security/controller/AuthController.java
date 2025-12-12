@@ -9,6 +9,7 @@ import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,21 +30,29 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request) {
-        // 🔹 Tenta autenticar o usuário com username e senha
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(), request.getPassword())
+            );
 
-        //  Busca o usuário completo no banco (pra ter id e role)
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+            User user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
 
-        // Gera o token com dados adicionais
-        String token = jwtService.generateToken(user);
+            String token = jwtService.generateToken(user);
 
-        // 🔹 Retorna o token no corpo da resposta
-        return ResponseEntity.ok(Map.of("token", token));
+            return ResponseEntity.ok(Map.of("token", token));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "erro", "Usuário ou senha inválidos."
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                    "erro", "Erro interno ao tentar autenticar."
+            ));
+        }
+
     }
-
 }

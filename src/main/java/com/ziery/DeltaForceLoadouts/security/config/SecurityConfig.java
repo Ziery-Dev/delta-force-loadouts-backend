@@ -70,7 +70,7 @@ public class SecurityConfig {
                 )
                 //  Define como os erros de autenticação serão tratados
                 //garante que, se o token estiver faltando ou inválido, a API retorne um erro JSON limpo (e não a tela de login padrão do Spring Security).
-                //.exceptionHandling(ex -> ex.authenticationEntryPoint(customEntryPoint))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(customEntryPoint))
 
 
                 // Define que a aplicação não manterá estado de sessão (stateless)

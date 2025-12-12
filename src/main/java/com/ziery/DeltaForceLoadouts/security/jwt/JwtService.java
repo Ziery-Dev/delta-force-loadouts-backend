@@ -25,18 +25,18 @@ public class JwtService {
     private String secretKey;
 
 
-    // 🔍 Extrai o username (subject) contido no token
+    //  Extrai o username (subject) contido no token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 🔧 Método genérico para extrair qualquer dado (claim) do token
+    //  Método genérico para extrair qualquer dado (claim) do token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // 🧾 Gera um token JWT contendo username e data de expiração
+    //  Gera um token JWT contendo username e data de expiração
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
