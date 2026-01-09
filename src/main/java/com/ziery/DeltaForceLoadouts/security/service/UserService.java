@@ -13,6 +13,7 @@ import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,6 +63,7 @@ public class UserService {
                     userDto.setId(user.getId());
                     userDto.setUsername(user.getUsername());
                     userDto.setRole(user.getRole());
+                    userDto.setEnabled(user.isEnabled());
                     return userDto;
 
                 }).collect(Collectors.toList());
@@ -69,6 +71,10 @@ public class UserService {
 
     //Remover usuário através do Id
     public void removerPorId(Long id) {
+        long total = buildRepository.countByCreatorId(id);
+        if(total > 0){
+            throw new DataIntegrityViolationException("Usuário não pode ser removido porque possui: " + total + " builds cadastrada(s)");
+        }
         var verifiUser = userRepository.findById(id).orElseThrow( () -> new DadoNaoEncontradoException("Usuário não econtrado para remoção"));
         userRepository.delete(verifiUser);
     }
@@ -120,6 +126,35 @@ public class UserService {
         authenticatedUser.removeFavoriteBuild(build);
         userRepository.save(authenticatedUser);
     }
+
+
+
+    //bloqueia usuário
+    public void blockUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+            if (user.getRole() == UserRoles.ADMIN) {
+                throw new IllegalStateException ("Usuário admin não pode ser bloqueado"); //Criar uma exception pra isso aqui
+            }
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+
+    //debloqueia usuário
+    public void unblockUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
+
+        user.setEnabled(true);
+        userRepository.save(user);
+
+    }
+
+
+
+
+
 }
 
 

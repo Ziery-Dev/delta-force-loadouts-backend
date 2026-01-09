@@ -2,10 +2,7 @@ package com.ziery.DeltaForceLoadouts.security.entity;
 
 import com.ziery.DeltaForceLoadouts.entity.Build;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -15,7 +12,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Table(name = "usuarios")
 public class User {
 
@@ -28,6 +25,8 @@ public class User {
     private String email;
 
     private String password;
+
+    private boolean enabled = true;
 
     @Enumerated(EnumType.STRING)
     private UserRoles role;

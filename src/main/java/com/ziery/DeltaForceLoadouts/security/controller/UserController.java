@@ -101,4 +101,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
+    @PostMapping("/bloquear-usuario/{id}")
+    public ResponseEntity<Void> bloquearUsuario(@PathVariable Long id) {
+        userService.blockUser(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/desbloquear-usuario/{id}")
+    public ResponseEntity<Void> desbloquearUsuario(@PathVariable Long id) {
+        userService.unblockUser(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

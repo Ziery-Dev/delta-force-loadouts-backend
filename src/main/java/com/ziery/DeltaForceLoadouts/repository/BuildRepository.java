@@ -60,6 +60,8 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
     """)
     List<Build> orderByDislikesDesc();
 
+    long countByCreatorId(Long id);
+
     //
 
 

@@ -3,6 +3,8 @@ package com.ziery.DeltaForceLoadouts.security.authenticationEntryPoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         errorResponse.put("timestamp", LocalDateTime.now().toString());
 
         // Define mensagens mais amigáveis
+        if (authException instanceof DisabledException) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.getWriter().write("{\"erro\":\"Usuário bloqueado\"}");
+            return;
+        }
+
         if (authException.getMessage().contains("Bad credentials")) {
             errorResponse.put("error", "Usuário ou senha inválidos.");
         } else if (authException.getMessage().contains("Full authentication is required")) {

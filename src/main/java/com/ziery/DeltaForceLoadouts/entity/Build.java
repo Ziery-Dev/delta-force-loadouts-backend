@@ -53,7 +53,7 @@ public class Build {
     @OneToMany(mappedBy = "build")
     private List<BuildRating> ratings;
 
-    @ManyToMany(mappedBy = "favoriteBuilds")
+    @ManyToMany(mappedBy = "favoriteBuilds", fetch = FetchType.EAGER)
     private Set<User> favoriteUsers = new HashSet<>();
 
 

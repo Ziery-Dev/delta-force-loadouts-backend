@@ -35,8 +35,9 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
+
 
     @Override
     public boolean isCredentialsNonExpired() {
@@ -45,7 +46,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;    }
+        return user.isEnabled();    }
 
     public Long getId() {
         return user.getId();

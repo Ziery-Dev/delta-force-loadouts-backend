@@ -14,7 +14,11 @@ public class UserDtoResponse {
     private String username;
     private String email;
     private UserRoles role;
+    private Boolean enabled;
+
 
     public UserDtoResponse(String username) {
     }
+
+    public UserDtoResponse(Long id, String username, String email, UserRoles role) {}
 }
