@@ -68,10 +68,21 @@ public class BuildService {
             String order,
             Long currentUserId,
             BuildRange distanceRange,
+            String search,
             Pageable pageable
     ) {
 
-        Specification<Build> spec = BuildSpec.byDistanceRange(distanceRange);
+        Specification<Build> spec = null;
+
+        if (distanceRange != null) {
+            spec = BuildSpec.byDistanceRange(distanceRange);
+        }
+
+        if (search != null && !search.isBlank()) {
+            spec = spec == null
+                    ? BuildSpec.search(search)
+                    : spec.and(BuildSpec.search(search));
+        }
 
         // define ordenação
         Sort sortConfig = order.equalsIgnoreCase("asc")
@@ -151,10 +162,24 @@ public class BuildService {
         return new BuildDtoResponse(buildSave);
     }
 
+    //Busca build pelo id do criador
+
     public Page<BuildDtoResponse> getBuildsByCreatorId(Long creatorId, Pageable pageable) {
         Page <Build> page = buildRepository.findByCreatorId(creatorId, pageable);
         return page.map(BuildDtoResponse::new);
     }
+
+
+    //busca as builds pelo nome do criador ou nome da arma
+    public Page<BuildDtoResponse> search(
+            String search,
+            Pageable pageable
+    ) {
+        return buildRepository
+                .findAll(BuildSpec.search(search), pageable)
+                .map(BuildDtoResponse::new);
+    }
+
 
 
 

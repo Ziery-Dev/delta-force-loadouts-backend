@@ -16,7 +16,11 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
 
     Page<Build> findByCreatorId(Long creatorId, Pageable pageable);
 
-   //para buscar builds favortadas atraves do id do usuario
+    //Page<Build> findByCreatorUsernameContainingIgnoreCase(String creatorName, Pageable pageable);
+
+
+
+    //para buscar builds favortadas atraves do id do usuario
    @Query("""
     SELECT b FROM Build b 
     JOIN b.favoriteUsers u
@@ -61,6 +65,8 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
     List<Build> orderByDislikesDesc();
 
     long countByCreatorId(Long id);
+
+
 
     //
 

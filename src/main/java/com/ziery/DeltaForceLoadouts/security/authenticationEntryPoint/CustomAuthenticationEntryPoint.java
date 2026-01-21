@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -26,28 +25,33 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             AuthenticationException authException
     ) throws IOException {
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json;charset=UTF-8");
 
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", 401);
         errorResponse.put("timestamp", LocalDateTime.now().toString());
+        errorResponse.put("path", request.getRequestURI());
 
-        // Define mensagens mais amigáveis
-        if (authException instanceof DisabledException) {
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.getWriter().write("{\"erro\":\"Usuário bloqueado\"}");
-            return;
+        String message;
+
+        String exceptionMessage = authException.getMessage();
+
+        if (exceptionMessage.contains("Full authentication is required")) {
+            message = "Token ausente ou inválido.";
+        }
+        else if (exceptionMessage.contains("JWT expired")
+                || exceptionMessage.contains("expired")) {
+            message = "Token expirado.";
+        }
+        else {
+            message = "Falha na autenticação.";
         }
 
-        if (authException.getMessage().contains("Bad credentials")) {
-            errorResponse.put("error", "Usuário ou senha inválidos.");
-        } else if (authException.getMessage().contains("Full authentication is required")) {
-            errorResponse.put("error", "Token ausente ou inválido.");
-        } else {
-            errorResponse.put("error", "Falha na autenticação.");
-        }
+        errorResponse.put("erro", message);
 
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.getWriter().write(
+                objectMapper.writeValueAsString(errorResponse)
+        );
     }
 }

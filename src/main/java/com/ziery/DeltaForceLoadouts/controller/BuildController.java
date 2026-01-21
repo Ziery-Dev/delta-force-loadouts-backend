@@ -59,7 +59,9 @@ public class BuildController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) BuildRange distanceRange,
+            @RequestParam(required = false) String search,
             Authentication authentication
+
     ) {
 
         User user = userRepository.findByUsername(authentication.getName())
@@ -67,7 +69,7 @@ public class BuildController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return buildService.getBuildsSorted(sort, order, user.getId(), distanceRange, pageable);
+        return buildService.getBuildsSorted(sort, order, user.getId(), distanceRange, search, pageable);
     }
 
 

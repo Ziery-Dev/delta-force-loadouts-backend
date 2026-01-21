@@ -7,9 +7,11 @@ import com.ziery.DeltaForceLoadouts.security.jwt.JwtService;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +50,13 @@ public class AuthController {
                     "erro", "Usuário ou senha inválidos."
             ));
 
-        } catch (Exception e) {
+        }
+        catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("erro", "Usuário bloqueado, em caso dúvidas contate um administrador."));
+        }
+
+        catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of(
                     "erro", "Erro interno ao tentar autenticar."
             ));
