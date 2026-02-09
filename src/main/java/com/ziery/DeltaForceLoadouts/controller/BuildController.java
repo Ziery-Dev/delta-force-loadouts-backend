@@ -64,12 +64,19 @@ public class BuildController {
 
     ) {
 
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow();
+        Long userId = null;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            userId = userRepository
+                    .findByUsername(authentication.getName())
+                    .map(User::getId)
+                    .orElse(null);
+        }
+
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return buildService.getBuildsSorted(sort, order, user.getId(), distanceRange, search, pageable);
+        return buildService.getBuildsSorted(sort, order, userId, distanceRange, search, pageable);
     }
 
 

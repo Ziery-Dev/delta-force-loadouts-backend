@@ -54,6 +54,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error); //400
     }
 
+    //Erro relacionado a excesso de tentativas num determinado tempo
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<Map<String, String>> handleRateLimit(RateLimitException ex) {
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("erro", ex.getMessage()));
+    }
+
+
     //  Erros inesperados
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {

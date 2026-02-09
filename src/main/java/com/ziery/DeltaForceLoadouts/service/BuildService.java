@@ -10,6 +10,8 @@ import com.ziery.DeltaForceLoadouts.entity.Weapon;
 import com.ziery.DeltaForceLoadouts.exception.AcessoNegadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoDuplicadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
+import com.ziery.DeltaForceLoadouts.exception.RateLimitException;
+import com.ziery.DeltaForceLoadouts.rateLimit.SimpleRateLimiter;
 import com.ziery.DeltaForceLoadouts.repository.BuildRatingRepository;
 import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.repository.WeaponRepository;
@@ -34,10 +36,19 @@ public class BuildService {
     private final WeaponRepository weaponRepository;
     private final UserRepository userRepository;
     private final BuildRatingRepository ratingRepository;
+    private final SimpleRateLimiter rateLimiter;
 
 
 
     public BuildDtoResponse createBuild(BuildDtoRequest request, User authenticatedUser) {
+        //Limitação de criação de build por usuário
+        String userKey = authenticatedUser.getUsername(); // geralmente username
+
+        if (!rateLimiter.allow(userKey)) {
+            throw new RateLimitException("Muitas tentativas de cadastro de builds em pouco tempo, tente novamente em alguns segundos");
+        }
+
+
         var verifyCode = buildRepository.findByCode(request.code());
         if (verifyCode.isPresent()) {
             throw new DadoDuplicadoException("Já existe uma build com esse código");
@@ -97,10 +108,12 @@ public class BuildService {
 
         Page<Build> page = buildRepository.findAll(spec, pageableSorted);
 
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow();
+        final User currentUser =
+                currentUserId != null
+                        ? userRepository.findById(currentUserId).orElse(null)
+                        : null;
 
-        return page.map(b -> new BuildDtoResponse(b, currentUser));
+        return page.map(build -> new BuildDtoResponse(build, currentUser));
     }
 
 

@@ -45,8 +45,8 @@ public record BuildDtoResponse(
                 build.getWeapon().getId(),
                 build.getCreator().getId(),
                 build.getCreatedAt(),
-                build.isLikedBy(currentUser),
-                build.isDislikedBy(currentUser)
+                currentUser != null && build.isLikedBy(currentUser),
+                currentUser != null && build.isDislikedBy(currentUser)
         );
     }
 
