@@ -1,8 +1,11 @@
 package com.ziery.DeltaForceLoadouts.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +17,7 @@ import java.util.Map;
 @Slf4j
 
 public class GlobalExceptionHandler {
+
 
     //  Erros de validação (DTOs com @NotBlank, @NotNull, etc)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -56,27 +60,19 @@ public class GlobalExceptionHandler {
         error.put("erro", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error); //400
     }
-
-    //Erro relacionado a excesso de tentativas num determinado tempo
-    @ExceptionHandler(RateLimitException.class)
-    public ResponseEntity<Map<String, String>> handleRateLimit(RateLimitException ex) {
-        return ResponseEntity
-                .status(HttpStatus.TOO_MANY_REQUESTS)
-                .body(Map.of("erro", ex.getMessage()));
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, String>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("erro", "Método HTTP não suportado para este endpoint");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error); // 405
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
-
         log.error("Erro interno não tratado", ex);
-
         Map<String, String> error = new HashMap<>();
         error.put("erro", "Erro interno no servidor");
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(error);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error); // 500
     }
 
 
