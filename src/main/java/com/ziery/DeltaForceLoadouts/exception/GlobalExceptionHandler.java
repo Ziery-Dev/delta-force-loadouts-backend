@@ -1,5 +1,6 @@
 package com.ziery.DeltaForceLoadouts.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@Slf4j
+
 public class GlobalExceptionHandler {
 
     //  Erros de validação (DTOs com @NotBlank, @NotNull, etc)
@@ -63,14 +66,18 @@ public class GlobalExceptionHandler {
     }
 
 
-    //  Erros inesperados
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+
+        log.error("Erro interno não tratado", ex);
+
         Map<String, String> error = new HashMap<>();
         error.put("erro", "Erro interno no servidor");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error); //500
-    }
 
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
 
 
 }
