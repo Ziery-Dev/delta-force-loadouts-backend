@@ -89,7 +89,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://192.168.18.40:8081")); // ou "*"
+        configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://192.168.18.40:8081", "https://delta-force-loadouts-frontend.vercel.app")); // ou "*"
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
