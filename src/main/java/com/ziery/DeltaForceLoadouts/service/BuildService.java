@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +36,7 @@ public class BuildService {
     private final BuildRepository buildRepository;
     private final WeaponRepository weaponRepository;
     private final UserRepository userRepository;
-    private final BuildRatingRepository ratingRepository;
+    private final BuildRatingRepository buildRatingRepository;
     private final SimpleRateLimiter rateLimiter;
 
 
@@ -126,6 +127,7 @@ public class BuildService {
     }
 
     //Remove uma build por ID
+    @Transactional
     public void removeBuildById(Long id,  User authenticatedUser) {
         Build build = buildRepository.findById(id)
                 .orElseThrow(() -> new DadoNaoEncontradoException("Build não encontrada na base de dados"));
@@ -136,7 +138,8 @@ public class BuildService {
         if (!isCreator && !isAdmin) {
             throw new AcessoNegadoException("Você não tem permissão para remover esta build");
         }
-
+        buildRatingRepository.deleteByBuildId(build.getId());      // limpa ratings
+        userRepository.deleteFavoritesByBuildId(build.getId());    // limpa join table
         buildRepository.delete(build);
 
     }
