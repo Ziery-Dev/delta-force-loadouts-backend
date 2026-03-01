@@ -51,15 +51,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAcessoNegado(AcessoNegadoException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("erro", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error); // 405
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error); // 403
     }
-    // Erros de regra de negócio
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+
+    //Erro de recurso em uso que geralemnte não pode excluido ou alterado
+    @ExceptionHandler(RecursoEmUsoException.class)
+    public ResponseEntity<Map<String, String>> handleRecursoEmUsoException(RecursoEmUsoException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("erro", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error); //400
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error); // 403
     }
+
+    //Geralmente uma url digitada errada ou mesmo estando certa mas o metodo não existe para ela, cai aqui
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Map<String, String>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
         Map<String, String> error = new HashMap<>();

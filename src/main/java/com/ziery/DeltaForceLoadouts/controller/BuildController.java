@@ -44,14 +44,7 @@ public class BuildController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    //Retorna todas as builds sem uma ordem especifica
-      /* @GetMapping
-        public ResponseEntity<List<BuildDtoResponse>> getAllBuilds(Authentication authentication) {
-            User authenticatedUser = userRepository.findByUsername(authentication.getName())
-                    .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
-            List <BuildDtoResponse> builds = buildService.getAllBuilds(authenticatedUser.getId());
-            return ResponseEntity.status(HttpStatus.OK).body(builds);
-        }*/
+
     @GetMapping
     public Page<BuildDtoResponse> getAllBuildsSorted(
             @RequestParam(defaultValue = "date") String sort,

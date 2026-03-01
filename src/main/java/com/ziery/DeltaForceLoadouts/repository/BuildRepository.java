@@ -64,7 +64,11 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
     """)
     List<Build> orderByDislikesDesc();
 
+    //Verifica quantas builds existem cadastradas com usuário atual tem
     long countByCreatorId(Long id);
+
+    //Verifica quantas builds existem cadastras com a arma atual
+    long countByWeaponId (Integer id);
 
 
 

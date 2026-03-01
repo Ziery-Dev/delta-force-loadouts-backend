@@ -53,20 +53,16 @@ public class UserService {
         var verifiUser = userRepository.findById(id).orElseThrow( () -> new DadoNaoEncontradoException("Usuário não econtrado"));
         return new UserDtoResponse(verifiUser.getId(), verifiUser.getUsername(), verifiUser.getEmail(), verifiUser.getRole());
     }
-
-    //Buscar todos usuários
-    public List<UserDtoResponse> buscarTodosUsuarios() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
+    public Page<UserDtoResponse> buscarTodosUsuarios(Pageable pageable) {
+        return userRepository.findAll(pageable)
                 .map(user -> {
-                    UserDtoResponse userDto = new UserDtoResponse();
-                    userDto.setId(user.getId());
-                    userDto.setUsername(user.getUsername());
-                    userDto.setRole(user.getRole());
-                    userDto.setEnabled(user.isEnabled());
-                    return userDto;
-
-                }).collect(Collectors.toList());
+                    UserDtoResponse dto = new UserDtoResponse();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    dto.setRole(user.getRole());
+                    dto.setEnabled(user.isEnabled());
+                    return dto;
+                });
     }
 
     //Remover usuário através do Id

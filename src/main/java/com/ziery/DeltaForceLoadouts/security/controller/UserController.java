@@ -13,6 +13,7 @@ import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -44,10 +45,19 @@ public class UserController {
         return ResponseEntity.ok(userDtoResponse);
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserDtoResponse>> buscarTodosUsuarios() {
-        List<UserDtoResponse> lista = userService.buscarTodosUsuarios();
-        return ResponseEntity.ok(lista);
+    @GetMapping("/users")
+    public Page<UserDtoResponse> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "asc") String order
+    ) {
+        Sort s = order.equalsIgnoreCase("desc")
+                ? Sort.by(sort).descending()
+                : Sort.by(sort).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, s);
+        return userService.buscarTodosUsuarios(pageable);
     }
 
 

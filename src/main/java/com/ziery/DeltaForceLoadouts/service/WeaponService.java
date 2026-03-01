@@ -2,15 +2,17 @@ package com.ziery.DeltaForceLoadouts.service;
 
 
 import com.ziery.DeltaForceLoadouts.dto.request.WeaponDtoRequest;
-import com.ziery.DeltaForceLoadouts.dto.response.OperatorDtoResponse;
 import com.ziery.DeltaForceLoadouts.dto.response.WeaponDtoResponse;
 import com.ziery.DeltaForceLoadouts.entity.Operator;
 import com.ziery.DeltaForceLoadouts.entity.Weapon;
 import com.ziery.DeltaForceLoadouts.exception.DadoDuplicadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
+import com.ziery.DeltaForceLoadouts.exception.RecursoEmUsoException;
+import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.repository.OperatorRepository;
 import com.ziery.DeltaForceLoadouts.repository.WeaponRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class WeaponService{
 
     private final WeaponRepository weaponRepository;
     private final OperatorRepository operatorRepository;
+    private final BuildRepository buildRepository;
 
 
 
@@ -61,7 +64,11 @@ public class WeaponService{
 
     //Remover arma
     public void removeWeapon (Integer id){
-        weaponRepository.findById(id).orElseThrow(()-> new DadoDuplicadoException("Arma não encontrada na base de dados para remoção"));
+        weaponRepository.findById(id).orElseThrow(()-> new DadoNaoEncontradoException("Arma não encontrada na base de dados para remoção"));
+        long total = buildRepository.countByWeaponId(id);
+        if (total > 0){
+            throw new RecursoEmUsoException("Arma não pode ser removida porque possui: " + total + " builds cadastrada(s)");
+        }
         weaponRepository.deleteById(id);
     }
 
@@ -73,7 +80,7 @@ public class WeaponService{
 
     }
 
-    public WeaponDtoResponse updateWeapon (Integer id, WeaponDtoRequest request){
+    public WeaponDtoResponse updateWeapon ( WeaponDtoRequest request, Integer id){
         var verifyWeaponId = weaponRepository.findById(id).orElseThrow(()-> new DadoDuplicadoException("Arma não encontrada na base de dados"));
         var verifyName = weaponRepository.findByName(request.name());
         if (verifyName.isPresent() && !verifyName.get().getId().equals(id)){

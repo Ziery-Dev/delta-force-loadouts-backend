@@ -47,7 +47,7 @@ public class WeaponController {
 
     @PutMapping("/{id}")
     public ResponseEntity<WeaponDtoResponse> updateWeapon ( @PathVariable Integer id, @RequestBody  @Valid WeaponDtoRequest request) {
-        var weapon = service.updateWeapon(id, request);
+        var weapon = service.updateWeapon(request, id);
         return ResponseEntity.ok().body(weapon);
     }
 }
