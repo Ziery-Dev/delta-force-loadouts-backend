@@ -6,7 +6,10 @@ import com.ziery.DeltaForceLoadouts.dto.response.OperatorDtoResponse;
 import com.ziery.DeltaForceLoadouts.entity.Operator;
 import com.ziery.DeltaForceLoadouts.exception.DadoDuplicadoException;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
+import com.ziery.DeltaForceLoadouts.exception.RecursoEmUsoException;
+import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.repository.OperatorRepository;
+import com.ziery.DeltaForceLoadouts.repository.WeaponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,7 @@ import java.util.List;
 public class OperatorService {
 
     private final OperatorRepository operatorRepository;
+    private final WeaponRepository weaponRepository;
 
     //Lista todos operadores
     public List<OperatorDtoResponse> listAllOperators() {
@@ -51,6 +55,10 @@ public class OperatorService {
     //remover operador por id
     public void removeOperatorById(Integer id) {
         var operator = operatorRepository.findById(id).orElseThrow(() -> new DadoNaoEncontradoException("Operador não econtrado na base de dados par remoção") );
+        var total = weaponRepository.countByCompatibleOperators_Id(operator.getId());
+        if (total > 0) {
+            throw new RecursoEmUsoException("Operador não pode ser removido porque possui: " + total + " armas cadastrada(s)");
+        }
         operatorRepository.delete(operator);
     }
 

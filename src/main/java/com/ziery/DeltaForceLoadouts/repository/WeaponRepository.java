@@ -10,4 +10,7 @@ public interface WeaponRepository extends JpaRepository<Weapon, Integer> {
 
     Optional<Weapon> findByName(String name);
 
+
+    //Verifica a quantidade de armas que existem cadastradas com o operador atual
+    long countByCompatibleOperators_Id(Integer operatorId);
 }
