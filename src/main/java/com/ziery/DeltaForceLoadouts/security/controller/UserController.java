@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(userDtoResponse);
     }
 
-    @GetMapping("/users")
+    @GetMapping()
     public Page<UserDtoResponse> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
