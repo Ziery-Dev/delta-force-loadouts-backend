@@ -19,6 +19,8 @@ public interface BuildRatingRepository extends JpaRepository<BuildRating, Long> 
     boolean existsByBuildIdAndUserIdAndRating(Long buildId, Long userId, int rating);
 
 
+
+
     //Deleção manual da avaliação associada a uma build (para remover a build sem erro de chave estrageira)
     @Modifying
     @Query("delete from BuildRating r where r.build.id = :buildId")
