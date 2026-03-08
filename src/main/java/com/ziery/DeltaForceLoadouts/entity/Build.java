@@ -2,7 +2,6 @@ package com.ziery.DeltaForceLoadouts.entity;
 
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,11 +37,10 @@ public class Build {
     private BuildRange distance_range;
 
 
-    @ManyToOne
-    @JoinColumn(name = "weapon_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "weapon_id", nullable = false)
     private Weapon weapon;
 
-    //Armazena a hora de criação da build
     private Instant createdAt = Instant.now();
 
     private Long likeCount = 0L;
@@ -53,7 +51,7 @@ public class Build {
     @OneToMany(mappedBy = "build")
     private List<BuildRating> ratings;
 
-    @ManyToMany(mappedBy = "favoriteBuilds", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "favoriteBuilds")
     private Set<User> favoriteUsers = new HashSet<>();
 
 

@@ -2,14 +2,15 @@ package com.ziery.DeltaForceLoadouts.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "Operators")
 public class Operator {
 
@@ -24,8 +25,6 @@ public class Operator {
     @Column(length = 15, nullable = false)
     private OperatorCategory category;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 15, nullable = false)
     @ManyToMany(mappedBy = "compatibleOperators")
     @EqualsAndHashCode.Exclude
     private Set<Weapon> compatibleWeapons = new HashSet<>();

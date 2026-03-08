@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "BuildRatings")
+@Table(name = "BuildRatings", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "build_id"}))
 public class BuildRating {
 
     @Id
@@ -18,9 +18,11 @@ public class BuildRating {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "build_id", nullable = false)
     private Build build;
 
 

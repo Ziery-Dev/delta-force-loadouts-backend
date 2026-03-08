@@ -10,6 +10,7 @@ import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class BuildRatingService {
     private final BuildRepository buildRepository;
 
 
+    @Transactional
     public BuildDtoResponse rateBuild(User user, Long buildId, int value) {
 
         //busca a build no respositorio
@@ -27,6 +29,10 @@ public class BuildRatingService {
         var existBuildRating = buildRatingRepository.findByUserAndBuild(user, build);
 
         if(existBuildRating.isEmpty()) { //se não foi avaliada, avalia inserindo o valor da avaliação (1 ou -1, like e dislike respectivamente)
+            if (value != 1 && value != -1) {
+                throw new IllegalArgumentException("Valor de avaliação inválido.");
+            }
+
             if (value == 1){
                 build.setLikeCount(build.getLikeCount() + 1);
             } else if (value == -1) {

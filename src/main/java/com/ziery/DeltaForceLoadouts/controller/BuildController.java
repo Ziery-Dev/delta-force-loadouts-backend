@@ -89,7 +89,7 @@ public class BuildController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BuildDtoResponse> removeBuildById(@PathVariable Long id,
+    public ResponseEntity<BuildDtoResponse> upadateBuildById(@PathVariable Long id,
                                                             @RequestBody BuildDtoRequest request,
                                                             Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())

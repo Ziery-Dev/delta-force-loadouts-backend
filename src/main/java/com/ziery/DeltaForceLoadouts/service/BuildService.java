@@ -16,6 +16,7 @@ import com.ziery.DeltaForceLoadouts.repository.BuildRatingRepository;
 import com.ziery.DeltaForceLoadouts.repository.BuildRepository;
 import com.ziery.DeltaForceLoadouts.repository.WeaponRepository;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
+import com.ziery.DeltaForceLoadouts.security.entity.UserRoles;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,8 +27,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,7 @@ public class BuildService {
 
 
 
+    @Transactional
     public BuildDtoResponse createBuild(BuildDtoRequest request, User authenticatedUser) {
         //Limitação de criação de build por usuário
         String userKey = authenticatedUser.getUsername(); // geralmente username
@@ -133,7 +133,7 @@ public class BuildService {
                 .orElseThrow(() -> new DadoNaoEncontradoException("Build não encontrada na base de dados"));
 
         boolean isCreator = build.getCreator().getId().equals(authenticatedUser.getId());
-        boolean isAdmin = authenticatedUser.getRole().toString().equals("ADMIN");
+        boolean isAdmin = authenticatedUser.getRole() == UserRoles.ADMIN;
 
         if (!isCreator && !isAdmin) {
             throw new AcessoNegadoException("Você não tem permissão para remover esta build");
@@ -152,10 +152,9 @@ public class BuildService {
 
         // Verifica permissão: criador ou admin
         boolean isCreator = existingBuild.getCreator().getId().equals(authenticatedUser.getId());
-        boolean isAdmin = authenticatedUser.getRole().toString().equals("ROLE_ADMIN");
 
-        if (!isCreator && !isAdmin) {
-            throw new AcessoNegadoException("Você não tem permissão para editar esta build");
+        if (!isCreator ) {
+            throw new AcessoNegadoException("Você não tem permissão para editar esta build!");
         }
 
         // Verifica duplicidade de código
@@ -195,14 +194,6 @@ public class BuildService {
                 .findAll(BuildSpec.search(search), pageable)
                 .map(BuildDtoResponse::new);
     }
-
-
-
-
-
-
-
-
 
 }
 
