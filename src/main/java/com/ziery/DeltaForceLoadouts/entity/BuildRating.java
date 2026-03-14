@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "BuildRatings", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "build_id"}))
+@Table(name = "buildRatings", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "build_id"}))
 public class BuildRating {
 
     @Id

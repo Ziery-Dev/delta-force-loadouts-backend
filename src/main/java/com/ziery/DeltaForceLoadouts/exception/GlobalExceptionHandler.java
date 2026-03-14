@@ -69,6 +69,14 @@ public class GlobalExceptionHandler {
         error.put("erro", "Método HTTP não suportado para este endpoint");
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error); // 405
     }
+    //Erro de limite de tentativas de determinada requisição
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<Map<String, String>> habdleRateLimitException(RateLimitException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error); // 429
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {

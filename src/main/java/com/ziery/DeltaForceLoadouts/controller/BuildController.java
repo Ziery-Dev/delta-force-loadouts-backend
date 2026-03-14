@@ -1,14 +1,12 @@
 package com.ziery.DeltaForceLoadouts.controller;
 
 
-import com.ziery.DeltaForceLoadouts.domain.specification.BuildSpec;
 import com.ziery.DeltaForceLoadouts.dto.request.BuildDtoRequest;
 import com.ziery.DeltaForceLoadouts.dto.response.BuildDtoResponse;
 import com.ziery.DeltaForceLoadouts.entity.BuildRange;
 import com.ziery.DeltaForceLoadouts.exception.DadoNaoEncontradoException;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
-import com.ziery.DeltaForceLoadouts.security.service.UserService;
 import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsImpl;
 import com.ziery.DeltaForceLoadouts.service.BuildRatingService;
 import com.ziery.DeltaForceLoadouts.service.BuildService;
@@ -22,10 +20,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -89,8 +84,8 @@ public class BuildController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BuildDtoResponse> upadateBuildById(@PathVariable Long id,
-                                                            @RequestBody BuildDtoRequest request,
+    public ResponseEntity<BuildDtoResponse> upadateBuildById(@PathVariable  Long id,
+                                                            @RequestBody @Valid BuildDtoRequest request,
                                                             Authentication authentication) {
         User authenticatedUser = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));

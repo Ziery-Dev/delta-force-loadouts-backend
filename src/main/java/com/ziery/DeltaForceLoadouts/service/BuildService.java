@@ -46,7 +46,7 @@ public class BuildService {
         String userKey = authenticatedUser.getUsername(); // geralmente username
 
         if (!rateLimiter.allow(userKey)) {
-            throw new RateLimitException("Muitas tentativas de cadastro de builds em pouco tempo, tente novamente em alguns segundos");
+            throw new RateLimitException("Muitas tentativas de cadastro de builds em pouco tempo, tente novamente em alguns segundos!");
         }
 
 
@@ -65,7 +65,7 @@ public class BuildService {
         Build build = new Build();
         build.setCode(request.code());
         build.setDescription(request.description());
-        build.setDistance_range(request.distance_range());
+        build.setDistanceRange(request.distance_range());
         build.setWeapon(weapon);
         build.setCreator(userFromDb); // associa o criador corretamente
 
@@ -156,7 +156,6 @@ public class BuildService {
         if (!isCreator ) {
             throw new AcessoNegadoException("Você não tem permissão para editar esta build!");
         }
-
         // Verifica duplicidade de código
         var verifyCode = buildRepository.findByCode(request.code());
         if (verifyCode.isPresent() && !verifyCode.get().getId().equals(id)) {
@@ -170,10 +169,10 @@ public class BuildService {
         // Atualiza os dados
         existingBuild.setCode(request.code());
         existingBuild.setDescription(request.description());
-        existingBuild.setDistance_range(request.distance_range());
+        existingBuild.setDistanceRange(request.distance_range());
         existingBuild.setWeapon(weapon);
 
-        var buildSave = buildRepository.save(existingBuild);
+        Build buildSave = buildRepository.save(existingBuild);
         return new BuildDtoResponse(buildSave);
     }
 

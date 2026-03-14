@@ -11,7 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "Operators")
+@Table(name = "operators")
 public class Operator {
 
     @Id

@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-
+    /// ATENÇÃO QUE ESSA QUERY PODE APRESENTAR PROBLEMAS NA MIGRAÇÃO PARA O POSTGRES
     //Implementação manual da deleção de uma build favoritada associada a um usuário (para que a build possa ser removida sem erro de chave estrageira)
     @Modifying
     @Query(value = "DELETE FROM user_favorites WHERE build_id = :buildId", nativeQuery = true)

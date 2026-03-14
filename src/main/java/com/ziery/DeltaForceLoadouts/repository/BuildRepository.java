@@ -3,7 +3,6 @@ package com.ziery.DeltaForceLoadouts.repository;
 import com.ziery.DeltaForceLoadouts.entity.Build;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -16,10 +15,6 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
 
     Page<Build> findByCreatorId(Long creatorId, Pageable pageable);
 
-    //Page<Build> findByCreatorUsernameContainingIgnoreCase(String creatorName, Pageable pageable);
-
-
-
     //para buscar builds favortadas atraves do id do usuario
    @Query("""
     SELECT b FROM Build b 
@@ -28,7 +23,7 @@ public interface BuildRepository extends JpaRepository<Build, Long>, JpaSpecific
 """)
    Page<Build> findFavoritesByUserId(Long userId, Pageable pageable);
 
-
+    /// ATENÇÃO QUE ESSAS 4 QUERYS PODEM APRESENTAR PROBLEMAS NA MIGRAÇÃO PARA O POSTGRES
     //Busca por quantidade de likes e dislikes
     // Likes
     @Query("""

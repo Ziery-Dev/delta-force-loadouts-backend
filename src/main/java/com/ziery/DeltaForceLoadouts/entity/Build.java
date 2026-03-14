@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name = "Builds")
+@Table(name = "builds")
 public class Build {
 
     @Id
@@ -33,15 +33,21 @@ public class Build {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 15, nullable = false)
-    private BuildRange distance_range;
+    @Column(length = 15, nullable = false, name = "distance_range")
+    private BuildRange distanceRange;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "weapon_id", nullable = false)
     private Weapon weapon;
 
-    private Instant createdAt = Instant.now();
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = Instant.now();
+    }
 
     private Long likeCount = 0L;
 

@@ -11,7 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name = "Weapons")
+@Table(name = "weapons")
 public class Weapon {
 
     @Id
