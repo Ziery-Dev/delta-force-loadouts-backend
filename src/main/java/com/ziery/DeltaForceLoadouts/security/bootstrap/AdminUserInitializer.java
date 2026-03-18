@@ -45,8 +45,6 @@ public class AdminUserInitializer implements CommandLineRunner {
             return;
         }
 
-
-
         User admin = new User();
         admin.setUsername(adminUsername);
         admin.setEmail(adminEmail);

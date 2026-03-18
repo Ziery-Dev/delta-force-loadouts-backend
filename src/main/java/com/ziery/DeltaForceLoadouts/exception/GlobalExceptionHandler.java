@@ -77,6 +77,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error); // 429
     }
 
+    //Excesso de tentativas de login
+    @ExceptionHandler(LoginBlockedException.class)
+    public ResponseEntity<Map<String, String>> handleLoginBlockedException(LoginBlockedException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {

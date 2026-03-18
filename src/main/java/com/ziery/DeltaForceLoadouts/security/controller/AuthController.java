@@ -5,7 +5,7 @@ import com.ziery.DeltaForceLoadouts.security.dto.AuthRequest;
 import com.ziery.DeltaForceLoadouts.security.entity.User;
 import com.ziery.DeltaForceLoadouts.security.jwt.JwtService;
 import com.ziery.DeltaForceLoadouts.security.repository.UserRepository;
-import com.ziery.DeltaForceLoadouts.security.userDetails.UserDetailsServiceImpl;
+import com.ziery.DeltaForceLoadouts.security.service.LoginAttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,9 +28,15 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request) {
+        String username = request.getUsername();
+
+        loginAttemptService.checkIfBlocked(username);
+
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -41,11 +46,19 @@ public class AuthController {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new DadoNaoEncontradoException("Usuário não encontrado"));
 
+            loginAttemptService.resetAttempts(username);
+
             String token = jwtService.generateToken(user);
 
             return ResponseEntity.ok(Map.of("token", token));
 
-        } catch (BadCredentialsException e) {
+
+
+        }
+
+
+        catch (BadCredentialsException e) {
+            loginAttemptService.registerFailedAttempt(username);
             return ResponseEntity.status(401).body(Map.of(
                     "erro", "Usuário ou senha inválidos."
             ));
