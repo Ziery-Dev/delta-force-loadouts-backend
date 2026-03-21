@@ -13,7 +13,7 @@ public class BuildSpec {
             if (ObjectUtils.isEmpty(distance)) {
                 return builder.conjunction(); //retorna tudo sem filtro
             }
-            return builder.equal(root.get("distance_range"), distance);
+            return builder.equal(root.get("distanceRange"), distance); //aqui o nome deve ser o da entidade e não do banco
         };
     }
 
